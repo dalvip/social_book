@@ -1,0 +1,25 @@
+<!-- <h2>Login</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+</form> -->
+
+{% load static %}
+
+<h2>Login</h2>
+
+<!-- Link to CSS for styling -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+</form>
+
+<!-- Include a static image (optional) -->
+<img src="{% static 'images/logo.png' %}" alt="Logo">
+
+<!-- Include a script if needed -->
+<script src="{% static 'js/setting.js' %}"></script>

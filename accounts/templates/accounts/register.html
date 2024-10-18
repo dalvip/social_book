@@ -1,0 +1,43 @@
+<!-- <h2>Register</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+</form>
+
+ Add a login button below -->
+<!-- <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p> --> 
+
+{% load static %}
+
+<!-- Include the CSS for styling the page -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div class="container">
+    <div class="form-container">
+        <!-- Add a header to enhance readability -->
+        <h2 class="form-header">Create Your Account</h2>
+
+        <!-- Registration form with better button styling and layout -->
+        <form method="post" class="register-form">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn-primary">Register</button>
+        </form>
+
+        <!-- Add a login prompt in case users already have an account -->
+        <p class="login-prompt">Already have an account?
+            <a href="{% url 'login' %}" class="login-link">Login here</a>
+        </p>
+    </div>
+
+    <!-- Optional logo image for branding -->
+    <div class="logo-container">
+        <img src="{% static 'images/apple-touch-icon.png' %}" alt="Logo" class="logo">
+    </div>
+</div>
+
+<!-- Include any necessary JS files for interactivity -->
+<script src="{% static 'js/setting.js' %}"></script>
