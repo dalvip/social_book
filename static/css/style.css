@@ -90,9 +90,16 @@ p {
 .slick-slide{
 	outline: none !important;
 }
-.container{
-	max-width: 1120px;
+.container {
 	width: 100%;
+	max-width: 400px;
+	/* Limit the container's max width */
+	padding: 20px;
+	background-color: #fff;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	/* Add some shadow for effect */
+	border-radius: 10px;
+	text-align: center;
 }
 /*==============================================================
 	Global Styles Start
