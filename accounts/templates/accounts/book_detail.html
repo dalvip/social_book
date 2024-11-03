@@ -1,0 +1,58 @@
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div class="book-detail-container">
+    <div class="book-detail">
+        <div class="book-image">
+            {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+            {% else %}
+            <img src="{% static 'images/default-book-cover.jpg' %}" alt="Default Cover">
+            {% endif %}
+        </div>
+
+        <div class="book-info">
+            <h1>{{ book.title }}</h1>
+            <p class="author">By {{ book.author.get_full_name }}</p>
+            <p class="price">₹{{ book.price }}</p>
+            <p class="genre">Genre: {{ book.genre }}</p>
+            <div class="description">
+                <h2>Description</h2>
+                {{ book.description|linebreaks }}
+            </div>
+        </div>
+        <div class="mt-6">
+            <a href="{% url 'home' %}"
+                class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Back to home page
+            </a>
+        </div>
+    </div>
+
+    {% if similar_books %}
+    <div class="similar-books">
+        <h2>Similar Books</h2>
+        <div class="books-grid">
+            {% for similar_book in similar_books %}
+            <div class="book-card">
+                <div class="book-cover">
+                    {% if similar_book.cover_image %}
+                    <img src="{{ similar_book.cover_image.url }}" alt="{{ similar_book.title }}">
+                    {% else %}
+                    <img src="{% static 'images/default-book-cover.jpg' %}" alt="Default Cover">
+                    {% endif %}
+                </div>
+                <div class="book-info">
+                    <h3>{{ similar_book.title }}</h3>
+                    <p class="price">₹{{ similar_book.price }}</p>
+                    <a href="{% url 'book_detail' similar_book.id %}" class="view-btn">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

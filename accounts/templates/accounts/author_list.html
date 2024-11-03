@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Authors</title>
+        <style>
+            /* Basic reset */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            /* Center the content */
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f9;
+                min-height: 100vh;
+                color: #333;
+            }
+
+            /* Card style for content box */
+            .container {
+                width: 80%;
+                max-width: 600px;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+
+            /* Heading styles */
+            h2 {
+                font-size: 1.8em;
+                color: #4a4a4a;
+                margin-bottom: 15px;
+            }
+
+            /* Styling the authors list */
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+
+            li {
+                font-size: 1.1em;
+                padding: 10px;
+                margin: 5px 0;
+                background-color: #e0e7ff;
+                border-radius: 5px;
+                color: #1f2937;
+                transition: background-color 0.3s ease;
+            }
+
+            li:hover {
+                background-color: #c7d2fe;
+            }
+
+            /* Responsive design */
+            @media (max-width: 768px) {
+                .container {
+                    width: 90%;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .container {
+                    width: 95%;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h2>Authors</h2>
+            <ul>
+                {% for author in authors %}
+                <li>{{ author.username }}</li>
+                {% empty %}
+                <li>No authors found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </body>
+
+</html>

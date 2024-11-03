@@ -1,0 +1,58 @@
+<!-- {% extends 'landing.html' %} -->
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>Authors and Sellers</h1>
+
+    {% if not request.user.is_authenticated %}
+    <div class="alert alert-danger">
+        You need to log in first to view the authors and sellers.
+        <a href="{% url 'login' %}" class="alert-link">Go to login page</a>
+    </div>
+    {% else %}
+    <div id="authors-content">
+        <p>Loading authors and sellers...</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            // Fetch authors and sellers data
+            const response = await fetch('/authors/list/', {
+                headers: {
+                    'Authorization': `Token ${request.user.auth_token.key}`
+                }
+            });
+            const authors = await response.json();
+
+            // Display authors and sellers
+            const authorsContent = document.getElementById('authors-content');
+            authorsContent.innerHTML = '';
+            authors.forEach(author => {
+                const card = document.createElement('div');
+                card.classList.add('card', 'mb-3');
+                card.innerHTML = `
+                <div class="card-body">
+                    <h5 class="card-title">${author.username}</h5>
+                    <p class="card-text">Email: ${author.email}</p>
+                    <p class="card-text">Age: ${author.age}</p>
+                    <!-- Add more author details as needed -->
+                </div>
+            `;
+                authorsContent.appendChild(card);
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            const authorsContent = document.getElementById('authors-content');
+            authorsContent.innerHTML = `
+            <div class="alert alert-danger">
+                Error loading authors and sellers. Please try again later.
+            </div>
+        `;
+        }
+    });
+</script>
+{% endblock %}
