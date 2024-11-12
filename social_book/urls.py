@@ -18,8 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from accounts import views as accounts_views
 # from django.contrib.auth import views as auth_views
-from accounts.views import register, login
-from accounts.views import authors_sellers
+from accounts.views import register, logout_view
 from accounts.views import UserFilesView
 from accounts import views
 from django.conf import settings
@@ -31,12 +30,11 @@ urlpatterns = [
     path('', accounts_views.home, name='home'),
     path('register/', register, name='register'),
     path('login/', views.login, name='login'),
-    # path('logout/', auth_views.LogoutView.as_view(template_name='accounts/logout.html'), name='logout'),
-    path('authors-sellers/', views.authors_sellers, name='authors-sellers'),
+    path('logout/', views.logout_view, name='logout'),
     # path('api/auth/', include('djoser.urls.authtoken')),
     path('api/user/files/', UserFilesView.as_view(), name='user-files'),
     # path('auth/', include('djoser.urls')),
     # path('auth/', include('djoser.urls.authtoken')),
-    path('send-email/', views.send_test_email, name='send_test_email'),
+    path('send-email/', views.send_welcome_email, name='send_test_email'),
     path('check-auth/', views.check_auth, name='check_auth'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

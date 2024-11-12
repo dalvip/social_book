@@ -1,10 +1,6 @@
-# accounts/models.py
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth import get_user_model
-# from models import CustomUser
-from django.db import models
 
 class Genre(models.Model):
     name = models.CharField(max_length=100)
@@ -17,18 +13,20 @@ class CustomUser(AbstractUser):
         ('author', 'Author'),
         ('seller', 'Seller'),
     ]
-    user_role = models.CharField(max_length=6, choices=USER_ROLES)  # New field for user role
+    user_role = models.CharField(max_length=6, choices=USER_ROLES,blank=False) 
     public_visibility = models.BooleanField(default=True)
-    birth_year = models.IntegerField(null=True, blank=True, default=2002)
+    birth_year = models.IntegerField(null=True, blank=True)
     address = models.CharField(max_length=255)
    
     
     @property
     def age(self):
         from datetime import datetime
-        current_year = datetime.now().year
-        return current_year - self.birth_year
-
+        if self.birth_year:  # Check if birth_year is not None
+            current_year = datetime.now().year
+            return current_year - self.birth_year
+        return None  # Or return 0 if preferred
+    
 class Book(models.Model):
     title = models.CharField(max_length=200, verbose_name="Book Title")
     author = models.ForeignKey(
@@ -56,7 +54,7 @@ class Book(models.Model):
         ]
         verbose_name = "Book"
         verbose_name_plural = "Books"
-        ordering = ['-created_at']  # Orders by creation date, newest first
+        ordering = ['-created_at']  
         
 class UploadFile(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -79,3 +77,12 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+class Sale(models.Model):
+    item = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    seller = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.item

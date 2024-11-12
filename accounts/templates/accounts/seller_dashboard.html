@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Seller Dashboard</title>
+    </head>
+
+    <body>
+        <h1>Seller Dashboard</h1>
+        <h2>Welcome, {{ user.username }}!</h2>
+
+        <h3>Your Sales</h3>
+        <ul>
+            {% for sale in sales %}
+            <li>{{ sale.item.title }} - {{ sale.amount }}</li>
+            {% endfor %}
+        </ul>
+
+        <p>Total Sales: {{ total_sales }}</p>
+    </body>
+
+</html>

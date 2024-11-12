@@ -10,48 +10,6 @@
 
     <body>
         <h1>My Uploaded Books</h1>
-        <!-- <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                // Get the auth token from localStorage
-                const authToken = localStorage.getItem('authToken');
-
-                // Check if the token exists
-                if (!authToken) {
-                    alert("You need to log in first!");
-                    window.location.href = "/login"; // Redirect to login page if no token
-                    return;
-                } -->
-
-                <!-- // Fetch data from the protected endpoint
-                fetch('/auth/token/login', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Token ${authToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Failed to fetch profile data");
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Display profile data in the page
-                        document.getElementById("profile-info").innerHTML = `
-                            <p>Name: ${data.name}</p>
-                            <p>Email: ${data.email}</p> -->
-                            <!-- Add more fields as needed -->
-                        <!-- `;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert("Session expired or login required.");
-                        window.location.href = "/login"; // Redirect to login if token is invalid
-                    });
-            });
-        </script> -->
-
 
         {% if files %}
         <ul>

@@ -26,7 +26,7 @@ from rest_framework.decorators import api_view
 from accounts.forms import LoginForm
 from django.contrib.auth import login as auth_login
 from .models import CustomUser
-from .models import Book
+from .models import Book,Sale
 from django.core.paginator import Paginator
 from django.shortcuts import  get_object_or_404
 from accounts.models import Genre
@@ -39,6 +39,8 @@ from .models import Book
 from .forms import BookForm, AuthorProfileForm
 from .mixins import AuthorRequiredMixin
 from .models import SellerProfile
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 def register(request):
@@ -49,17 +51,17 @@ def register(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data.get('password1'))
             user.save()
-
+            send_welcome_email(user.email)
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
 
             if user is not None:
                 login(request)
-                return redirect('login')  
+                return redirect('home')  
             else:
                 messages.error(request, 'User authentication failed.')
-                return redirect('register')  # Optional: Redirect back to register page on failure
+                return redirect('register') 
 
     else:
         form = RegisterForm()
@@ -88,11 +90,10 @@ def login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 auth_login(request, user)
-                # Check the user role and redirect accordingly
                 if user.user_role == 'author':
-                    return redirect('author_dashboard')  # Replace with the URL name for the author list
+                    return redirect('author_dashboard')  
                 elif user.user_role == 'seller':
-                    return redirect('seller_list')  # Replace with the URL name for the seller list
+                    return redirect('seller_list')  
             else:
                 form.add_error(None, 'Invalid username or password')
     else:
@@ -108,17 +109,12 @@ def get_auth_token(request):
     return JsonResponse({'token': token.key})
 
 def logout_view(request):
-    # Clear tokens from session
     request.session.pop('token', None)
     request.session.pop('token', None)
     
     # Regular Django logout
     logout(request)
     return redirect('home')
-
-def authors_sellers(request):
-    users = User.objects.filter(public_visibility=True)
-    return render(request, 'authors_sellers.html', {'users': users})
 
 class UserFilter(django_filters.FilterSet):
     class Meta:
@@ -139,7 +135,7 @@ def upload_books(request):
             uploaded_file = form.save(commit=False)
             uploaded_file.user = request.user  
             uploaded_file.save()
-            return redirect('accounts/upload_books.html')
+            return redirect('my-books.html')
     else:
         form = UploadFileForm()
 
@@ -158,7 +154,7 @@ class UserFilesView(APIView):
 
     def get(self, request):
         user = request.user
-        files = UploadFile.objects.filter(user=user)  # Assuming you have a foreign key to user
+        files = UploadFile.objects.filter(user=user) 
         serializer = UploadFileSerializer(files, many=True)
         return Response(serializer.data)
     
@@ -174,14 +170,14 @@ def my_books_dashboard(request):
     if user_files.exists():
         return render(request, 'my_books.html', {'files': user_files})
     return redirect('upload_books')
-@csrf_exempt
-def send_test_email(request):
+def send_welcome_email(user_email):
     subject = 'Welcome to Social Book!'
     message = 'Thank you for registering with Social Book!'
-    recipient_list = ['rathodvishal9850@gmail.com']  # Replace with the recipient's email
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [user_email]
 
-    send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
-    return HttpResponse("Test email sent successfully.")
+    send_mail(subject, message, from_email, recipient_list)
+
 def landing_page(request):
     featured_books = Book.objects.filter(is_public=True).order_by('-created_at')[:6]
     return render(request, 'accounts/landing.html', {'books': featured_books})
@@ -195,28 +191,18 @@ def book_detail(request, book_id):
     })
 
 def book_list(request):
-    # Get all genres (consider caching this if it doesn't change often)
     genres = Genre.objects.all()
-    
-    # Get filter parameters
     selected_genre = request.GET.get('genre', '')
     search_query = request.GET.get('search', '')
-    sort_by = request.GET.get('sort', '-created_at')  # Default sorting by newest
-    
-    # Start with base queryset
+    sort_by = request.GET.get('sort', '-created_at')  
     books = Book.objects.filter(is_public=True)
-    
-    # Apply genre filter
     if selected_genre:
         try:
-            # Convert selected_genre to integer for comparison
             genre_id = int(selected_genre)
             books = books.filter(genre_id=genre_id)
         except (ValueError, TypeError):
-            # Handle invalid genre ID
             pass
     
-    # Apply search if provided
     if search_query:
         books = books.filter(
             Q(title__icontains=search_query) |
@@ -224,12 +210,11 @@ def book_list(request):
             Q(description__icontains=search_query)
         )
     
-    # Apply sorting
+    
     valid_sort_fields = ['title', '-title', 'created_at', '-created_at', 'author', '-author']
     if sort_by in valid_sort_fields:
         books = books.order_by(sort_by)
     
-    # Optimize query with select_related for foreign keys
     books = books.select_related('author', 'genre')
     
     # Pagination
@@ -240,27 +225,22 @@ def book_list(request):
     try:
         page_obj = paginator.get_page(page_number)
     except PageNotAnInteger:
-        # If page is not an integer, deliver first page
         page_obj = paginator.get_page(1)
     except EmptyPage:
-        # If page is out of range, deliver last page of results
         page_obj = paginator.get_page(paginator.num_pages)
     
-    # Convert selected_genre to integer for template comparison
     try:
         selected_genre_id = int(selected_genre) if selected_genre else None
     except (ValueError, TypeError):
         selected_genre_id = None
     
-    # Mark selected genres for easier template handling
     for genre in genres:
         genre.is_selected = genre.id == selected_genre_id
     
-    # Prepare template context
     context = {
         'page_obj': page_obj,
         'genres': genres,
-        'selected_genre': selected_genre_id,  # Now passing the integer ID
+        'selected_genre': selected_genre_id,  
         'search_query': search_query,
         'sort_by': sort_by,
         'total_books': books.count(),
@@ -268,11 +248,16 @@ def book_list(request):
         'items_per_page': items_per_page,
     }
     
-    return render(request, 'accounts/book_list.html', context)
+
 @login_required
 def author_dashboard(request):
-    user_books = Book.objects.filter(author=request.user)
-    return render(request, 'accounts/author_dashboard.html', {'books': user_books})
+    if request.user.user_role == 'author':
+        user_books = Book.objects.filter(author=request.user)
+        return render(request, 'accounts/author_dashboard.html', {'books': user_books})
+    elif request.user.user_role == 'seller':
+            return ['accounts/seller_dashboard.html']
+    else:
+        return redirect('home') 
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -281,7 +266,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_template_names(self):
         if self.request.user.user_role == 'author':
             return ['accounts/author_dashboard.html']
-        return ['accounts/seller_dashboard.html']
+        elif self.request.user.user_role == 'seller':
+            return ['accounts/seller_dashboard.html']
+        return ['accounts/home.html']
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -290,12 +277,15 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         if user.user_role == 'author':
             context['books'] = Book.objects.filter(author=user)
             context['total_books'] = context['books'].count()
-            # Add any author-specific context here
-        else:
-            # Add seller-specific context here
+            
+        elif user.user_role == 'seller':
+            context['sales'] = Sale.objects.filter(seller=user)
+            context['total_sales'] = context['sales'].count()
+        else :
             pass
         
         return context
+
 
 class BookListView(LoginRequiredMixin, AuthorRequiredMixin, ListView,CustomUser):
     model = Book
@@ -355,7 +345,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
 def seller_profile(request, seller_id):
     seller = get_object_or_404(SellerProfile, user__id=seller_id)
-    books = seller.user.book_set.filter(is_public=True)  # assuming seller has a related `book_set` with `Book` model
+    books = seller.user.book_set.filter(is_public=True)  
     context = {
         'seller': seller,
         'books': books

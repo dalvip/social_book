@@ -9,4 +9,4 @@ class AuthorRequiredMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
             raise PermissionDenied("Only authors can access this page.")
-        return redirect('login')
+        return redirect('login') 

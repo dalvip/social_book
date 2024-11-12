@@ -33,7 +33,7 @@ nav ul {
 }
 
 nav ul li {
-	margin-left: 2rem;
+	margin-left: 1rem;
 }
 
 nav ul li a {
@@ -391,40 +391,6 @@ main {
 	text-align: center;
 	margin-top: 1.5rem;
 	/* Reduced top margin */
-}
-
-
-/* Enhanced Footer */
-footer {
-	background-color: #2c5282;
-	color: white;
-	padding: 2rem 0;
-}
-
-.footer-content {
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 0 2rem;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.footer-nav ul {
-	display: flex;
-	gap: 2rem;
-	list-style: none;
-	padding: 0;
-}
-
-.footer-nav a {
-	color: white;
-	text-decoration: none;
-	transition: opacity 0.3s ease;
-}
-
-.footer-nav a:hover {
-	opacity: 0.8;
 }
 
 /* Responsive Design */

@@ -9,10 +9,14 @@ from .models import Book
 
 
 class RegisterForm(UserCreationForm):
-    role = forms.ChoiceField(choices=CustomUser.USER_ROLES, required=True)
+    # role = forms.ChoiceField(
+    #     choices=CustomUser.USER_ROLES,
+    #     widget=forms.RadioSelect,
+    #     required=True
+    # )
     class Meta:
         model = CustomUser
-        fields = ['role','username', 'email', 'birth_year', 'address', 'public_visibility', 'password1', 'password2']
+        fields = ['user_role','username', 'email', 'birth_year', 'address', 'public_visibility', 'password1', 'password2']
 
     def clean(self):
         cleaned_data = super().clean()
