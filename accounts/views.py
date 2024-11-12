@@ -309,7 +309,7 @@ class BookCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
 class BookUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Book
     form_class = BookForm
-    template_name = 'accounts/book_form.html'
+    template_name = 'accounts/book_details.html'
     success_url = reverse_lazy('dashboard')
     
     def get_queryset(self):
